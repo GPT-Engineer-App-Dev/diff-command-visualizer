@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Play, RotateCcw, Code, ChevronRight } from "lucide-react";
+import { RotateCcw, Code, ChevronRight } from "lucide-react";
 import Prism from 'prismjs';
 import 'prismjs/components/prism-javascript';
 import 'prismjs/themes/prism.css';
@@ -34,10 +34,12 @@ const x = 10;`);
 
   const [highlightedCode, setHighlightedCode] = useState('');
   const [currentStep, setCurrentStep] = useState(0);
+  const [isTyping, setIsTyping] = useState(false);
+  const [cursorPosition, setCursorPosition] = useState(0);
 
   useEffect(() => {
     highlightChanges();
-  }, [code, commands, currentStep]);
+  }, [code, commands, currentStep, cursorPosition]);
 
   const highlightChanges = () => {
     const commandLines = commands.split('\n');
@@ -53,8 +55,16 @@ const x = 10;`);
         const index = currentCode.indexOf(search);
         highlighted += Prism.highlight(currentCode.slice(lastIndex, index), Prism.languages.javascript, 'javascript');
         if (i === (currentStep - 1) * 2) {
-          highlighted += `<span class="bg-yellow-200 transition-all duration-500">${Prism.highlight(search, Prism.languages.javascript, 'javascript')}</span>`;
-          highlighted += `<span class="bg-green-200 transition-all duration-500">${Prism.highlight(replace, Prism.languages.javascript, 'javascript')}</span>`;
+          if (isTyping) {
+            const typedPart = replace.slice(0, cursorPosition);
+            const untypedPart = replace.slice(cursorPosition);
+            highlighted += `<span class="bg-yellow-200">${Prism.highlight(search, Prism.languages.javascript, 'javascript')}</span>`;
+            highlighted += `<span class="bg-green-200">${Prism.highlight(typedPart, Prism.languages.javascript, 'javascript')}</span>`;
+            highlighted += `<span class="bg-green-200 relative"><span class="absolute w-0.5 h-5 bg-black animate-blink"></span>${Prism.highlight(untypedPart, Prism.languages.javascript, 'javascript')}</span>`;
+          } else {
+            highlighted += `<span class="bg-yellow-200">${Prism.highlight(search, Prism.languages.javascript, 'javascript')}</span>`;
+            highlighted += `<span class="bg-green-200">${Prism.highlight(replace, Prism.languages.javascript, 'javascript')}</span>`;
+          }
         } else {
           highlighted += Prism.highlight(replace, Prism.languages.javascript, 'javascript');
         }
@@ -70,13 +80,30 @@ const x = 10;`);
   const executeNextStep = () => {
     const commandLines = commands.split('\n');
     if (currentStep * 2 < commandLines.length) {
-      setCurrentStep(currentStep + 1);
+      setIsTyping(true);
+      setCursorPosition(0);
+      const search = commandLines[currentStep * 2];
+      const replace = commandLines[currentStep * 2 + 1] || '';
+      
+      const typeNextChar = (index) => {
+        if (index < replace.length) {
+          setCursorPosition(index + 1);
+          setTimeout(() => typeNextChar(index + 1), 50 + Math.random() * 50);
+        } else {
+          setIsTyping(false);
+          setCurrentStep(currentStep + 1);
+        }
+      };
+
+      typeNextChar(0);
     }
   };
 
   const resetCode = () => {
     setCode(initialCode);
     setCurrentStep(0);
+    setIsTyping(false);
+    setCursorPosition(0);
   };
 
   return (
@@ -91,7 +118,7 @@ const x = 10;`);
             <Button onClick={resetCode} variant="outline">
               <RotateCcw className="mr-2 h-4 w-4" /> Reset Code
             </Button>
-            <Button onClick={executeNextStep}>
+            <Button onClick={executeNextStep} disabled={isTyping}>
               <ChevronRight className="mr-2 h-4 w-4" /> Next Step
             </Button>
           </div>
