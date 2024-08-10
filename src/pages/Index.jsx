@@ -6,8 +6,29 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Diff, Search, Play } from "lucide-react";
 
 const Index = () => {
-  const [code, setCode] = useState('// Your code here');
-  const [commands, setCommands] = useState('');
+  const [code, setCode] = useState(`function greet(name) {
+  console.log("Hello, " + name + "!");
+}
+
+const numbers = [1, 2, 3, 4, 5];
+const doubled = numbers.map(function(num) {
+  return num * 2;
+});
+
+let x = 10;
+if (x > 5) {
+  console.log("x is greater than 5");
+}`);
+
+  const [commands, setCommands] = useState(`console.log("Hello, " + name + "!");
+console.log(\`Hello, \${name}!\`);
+const doubled = numbers.map(function(num) {
+const doubled = numbers.map((num) =>
+if (x > 5) {
+if (x > 5 && x < 15) {
+let x = 10;
+const x = 10;`);
+
   const [diffs, setDiffs] = useState([]);
 
   const executeCommands = () => {
