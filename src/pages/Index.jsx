@@ -3,6 +3,9 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Play, RotateCcw, Code, ChevronRight } from "lucide-react";
+import Prism from 'prismjs';
+import 'prismjs/components/prism-javascript';
+import 'prismjs/themes/prism.css';
 
 const initialCode = `function greet(name) {
   console.log("Hello, " + name + "!");
@@ -48,19 +51,19 @@ const x = 10;`);
 
       if (search && currentCode.includes(search)) {
         const index = currentCode.indexOf(search);
-        highlighted += currentCode.slice(lastIndex, index);
+        highlighted += Prism.highlight(currentCode.slice(lastIndex, index), Prism.languages.javascript, 'javascript');
         if (i === (currentStep - 1) * 2) {
-          highlighted += `<span class="bg-yellow-200 transition-all duration-500">${search}</span>`;
-          highlighted += `<span class="bg-green-200 transition-all duration-500">${replace}</span>`;
+          highlighted += `<span class="bg-yellow-200 transition-all duration-500">${Prism.highlight(search, Prism.languages.javascript, 'javascript')}</span>`;
+          highlighted += `<span class="bg-green-200 transition-all duration-500">${Prism.highlight(replace, Prism.languages.javascript, 'javascript')}</span>`;
         } else {
-          highlighted += replace;
+          highlighted += Prism.highlight(replace, Prism.languages.javascript, 'javascript');
         }
         lastIndex = index + search.length;
         currentCode = currentCode.replace(search, replace);
       }
     }
 
-    highlighted += currentCode.slice(lastIndex);
+    highlighted += Prism.highlight(currentCode.slice(lastIndex), Prism.languages.javascript, 'javascript');
     setHighlightedCode(highlighted);
   };
 
@@ -100,8 +103,8 @@ const x = 10;`);
             <h2 className="text-xl font-semibold mb-2 flex items-center">
               <Code className="mr-2 h-5 w-5 text-blue-500" /> Code
             </h2>
-            <div 
-              className="flex-grow font-mono p-4 border rounded overflow-auto whitespace-pre text-sm bg-white"
+            <pre 
+              className="flex-grow font-mono p-4 border rounded overflow-auto text-sm bg-white"
               dangerouslySetInnerHTML={{ __html: highlightedCode }}
             />
           </Card>
