@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Play, RotateCcw, Code } from "lucide-react";
+import { Play, RotateCcw, Code, ChevronRight } from "lucide-react";
 
 const initialCode = `function greet(name) {
   console.log("Hello, " + name + "!");
@@ -30,10 +30,11 @@ let x = 10;
 const x = 10;`);
 
   const [highlightedCode, setHighlightedCode] = useState('');
+  const [currentStep, setCurrentStep] = useState(0);
 
   useEffect(() => {
     highlightChanges();
-  }, [code, commands]);
+  }, [code, commands, currentStep]);
 
   const highlightChanges = () => {
     const commandLines = commands.split('\n');
@@ -41,16 +42,21 @@ const x = 10;`);
     let highlighted = '';
     let lastIndex = 0;
 
-    for (let i = 0; i < commandLines.length; i += 2) {
+    for (let i = 0; i < Math.min(currentStep * 2, commandLines.length); i += 2) {
       const search = commandLines[i];
       const replace = commandLines[i + 1] || '';
 
       if (search && currentCode.includes(search)) {
         const index = currentCode.indexOf(search);
         highlighted += currentCode.slice(lastIndex, index);
-        highlighted += `<span class="bg-yellow-200">${search}</span>`;
-        highlighted += `<span class="bg-green-200">${replace}</span>`;
+        if (i === (currentStep - 1) * 2) {
+          highlighted += `<span class="bg-yellow-200 transition-all duration-500">${search}</span>`;
+          highlighted += `<span class="bg-green-200 transition-all duration-500">${replace}</span>`;
+        } else {
+          highlighted += replace;
+        }
         lastIndex = index + search.length;
+        currentCode = currentCode.replace(search, replace);
       }
     }
 
@@ -58,24 +64,16 @@ const x = 10;`);
     setHighlightedCode(highlighted);
   };
 
-  const executeCommands = () => {
+  const executeNextStep = () => {
     const commandLines = commands.split('\n');
-    let currentCode = code;
-
-    for (let i = 0; i < commandLines.length; i += 2) {
-      const search = commandLines[i];
-      const replace = commandLines[i + 1] || '';
-
-      if (search && currentCode.includes(search)) {
-        currentCode = currentCode.replace(search, replace);
-      }
+    if (currentStep * 2 < commandLines.length) {
+      setCurrentStep(currentStep + 1);
     }
-
-    setCode(currentCode);
   };
 
   const resetCode = () => {
     setCode(initialCode);
+    setCurrentStep(0);
   };
 
   return (
@@ -90,8 +88,8 @@ const x = 10;`);
             <Button onClick={resetCode} variant="outline">
               <RotateCcw className="mr-2 h-4 w-4" /> Reset Code
             </Button>
-            <Button onClick={executeCommands}>
-              <Play className="mr-2 h-4 w-4" /> Execute Commands
+            <Button onClick={executeNextStep}>
+              <ChevronRight className="mr-2 h-4 w-4" /> Next Step
             </Button>
           </div>
         </div>
