@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Play, RotateCcw } from "lucide-react";
+import { Play, RotateCcw, Code } from "lucide-react";
 
 const initialCode = `function greet(name) {
   console.log("Hello, " + name + "!");
@@ -79,32 +79,45 @@ const x = 10;`);
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4">Real-time Code Change Visualizer</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="p-4">
-          <h2 className="text-xl font-semibold mb-2">Code</h2>
-          <div 
-            className="h-64 font-mono p-2 border rounded overflow-auto whitespace-pre"
-            dangerouslySetInnerHTML={{ __html: highlightedCode }}
-          />
-          <Button onClick={resetCode} className="mt-2" variant="outline">
-            <RotateCcw className="mr-2 h-4 w-4" /> Reset Code
-          </Button>
-        </Card>
-        <Card className="p-4">
-          <h2 className="text-xl font-semibold mb-2">Search and Replace Commands</h2>
-          <Textarea
-            value={commands}
-            onChange={(e) => setCommands(e.target.value)}
-            className="h-64 font-mono"
-            placeholder="Enter search and replace commands (one per line)"
-          />
-          <Button onClick={executeCommands} className="mt-2">
-            <Play className="mr-2 h-4 w-4" /> Execute Commands
-          </Button>
-        </Card>
-      </div>
+    <div className="flex flex-col h-screen bg-gray-100">
+      <header className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+          <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+            <Code className="mr-2 h-8 w-8 text-blue-500" />
+            Real-time Code Change Visualizer
+          </h1>
+          <div className="flex space-x-2">
+            <Button onClick={resetCode} variant="outline">
+              <RotateCcw className="mr-2 h-4 w-4" /> Reset Code
+            </Button>
+            <Button onClick={executeCommands}>
+              <Play className="mr-2 h-4 w-4" /> Execute Commands
+            </Button>
+          </div>
+        </div>
+      </header>
+      <main className="flex-grow p-4">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4 h-full">
+          <Card className="p-4 flex flex-col h-full">
+            <h2 className="text-xl font-semibold mb-2 flex items-center">
+              <Code className="mr-2 h-5 w-5 text-blue-500" /> Code
+            </h2>
+            <div 
+              className="flex-grow font-mono p-4 border rounded overflow-auto whitespace-pre text-sm bg-white"
+              dangerouslySetInnerHTML={{ __html: highlightedCode }}
+            />
+          </Card>
+          <Card className="p-4 flex flex-col h-full">
+            <h2 className="text-xl font-semibold mb-2">Search and Replace Commands</h2>
+            <Textarea
+              value={commands}
+              onChange={(e) => setCommands(e.target.value)}
+              className="flex-grow font-mono text-sm resize-none"
+              placeholder="Enter search and replace commands (one per line)"
+            />
+          </Card>
+        </div>
+      </main>
     </div>
   );
 };
