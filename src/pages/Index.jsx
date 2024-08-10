@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Play } from "lucide-react";
+import { Play, RotateCcw } from "lucide-react";
 
-const Index = () => {
-  const [code, setCode] = useState(`function greet(name) {
+const initialCode = `function greet(name) {
   console.log("Hello, " + name + "!");
 }
 
@@ -17,8 +16,10 @@ const doubled = numbers.map(function(num) {
 let x = 10;
 if (x > 5) {
   console.log("x is greater than 5");
-}`);
+}`;
 
+const Index = () => {
+  const [code, setCode] = useState(initialCode);
   const [commands, setCommands] = useState(`console.log("Hello, " + name + "!");
 console.log(\`Hello, \${name}!\`);
 const doubled = numbers.map(function(num) {
@@ -73,6 +74,10 @@ const x = 10;`);
     setCode(currentCode);
   };
 
+  const resetCode = () => {
+    setCode(initialCode);
+  };
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-4">Real-time Code Change Visualizer</h1>
@@ -83,6 +88,9 @@ const x = 10;`);
             className="h-64 font-mono p-2 border rounded overflow-auto whitespace-pre"
             dangerouslySetInnerHTML={{ __html: highlightedCode }}
           />
+          <Button onClick={resetCode} className="mt-2" variant="outline">
+            <RotateCcw className="mr-2 h-4 w-4" /> Reset Code
+          </Button>
         </Card>
         <Card className="p-4">
           <h2 className="text-xl font-semibold mb-2">Search and Replace Commands</h2>
